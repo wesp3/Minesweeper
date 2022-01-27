@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MinesweeperV1</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body onload="initSweeper()">
+    <div class="container modal">
+        <div class="container game-container">
+            <h1 class="title">MinesweeperV1</h1>
+
+            <div class="menu">
+                <div class="lives-container">
+                    Lives: <span class="lives"></span>
+                </div>
+                <div class="reset-container">
+                    <button><span class="reset">Reset</span></button>
+                </div>
+                <div class="timer-container">
+                    Timer: <span class="timer"></span>
+                </div>
+            </div>
+            <div class="container board-container game">
+                <!-- <div class="container game"> -->
+                    <table class="board"></table>
+                <!-- </div> -->
+            </div>
+
+            <div class="difficulty">
+                <button class="easy" onclick="changeBoardSize(4)">Novice</button>
+                <button class="medium" onclick="changeBoardSize(8)">Journeyman</button>
+                <button class="extreme" onclick="changeBoardSize(12)">Unreal</button>
+            </div>
+
+        </div>
+
+        <div class="lose-container">
+            <div class="lose">You Lose!</div>
+        </div>
+        <div class="win-container">
+            <div class="win">You Win!</div>
+        </div>
+    </div>
+
+    <script src="js/game.js"></script>
+    <script src="js/utils.js"></script>
+   
+</body>
+</html>
