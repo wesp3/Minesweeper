@@ -8,6 +8,8 @@
 // work on CSS has to be done, the hardest mode on board is having problems with padding
 //code refactoring(!)
 
+// victory wont appear 
+
 
 const MINE_SIGN = "💣"
 const FLAG_SIGN = "🚩"
@@ -34,6 +36,7 @@ var gGame = {
     isOver: false,
     shownCount: 0,
     markedCount: 0,
+    markedRight: 0,
     secsPassed: 0
     }  
 
@@ -57,23 +60,6 @@ function initSweeper() {
         markedCount: 0,
         secsPassed: 0
     }
-    switch (gLevel.SIZE) {
-        case 4:
-            gLevel.LIVES = 1
-            gLevel.MINES = 2
-            gLevel.CELL = 16
-            break;
-        case 8:
-            gLevel.LIVES = 3
-            gLevel.MINES = 12
-            gLevel.CELL = 64
-            break;
-        case 12:
-            gLevel.LIVES  = 3
-            gLevel.MINES = 30
-            gLevel.CELL = 144
-            break;
-    }
     renderLives(gLevel.LIVES)
 }
 
@@ -85,7 +71,7 @@ function createBoard(size) {
         for (var j = 0; j < size; j++) {
             board[i][j] = {
                 isMine: false,
-                isShelled: false,
+                isBombed: false,
                 isShown: false,
                 isMarked: false,
                 minesAroundCount:0
@@ -97,7 +83,7 @@ function createBoard(size) {
 
 
 
-function renderBoard(board) {
+function renderBoard(board) { //TODO maybe i should change the name of this function
     var strHTML = ''
     for (var i = 0; i < board.length; i++) {
         strHTML += '<tr>'
@@ -105,15 +91,15 @@ function renderBoard(board) {
             var cell = board[i][j]
             switch (gLevel.SIZE) {                       //cells
                 case 4:
-                    strHTML += `<td data-i="${i}" data-j="${j}" onmousedown="cellMarked(this,event,${i}, ${j})" onclick="cellClicked(this, ${i}, ${j})" class="cell cell-easy"></td>`
+                    strHTML += `<td data-i="${i}" data-j="${j}" onmousedown="cellMarked(this,event,${i}, ${j})" onclick="cellClicked(this, ${i}, ${j})" class="cell-easy" clicked="False"></td>`
 
                     break;
                 case 8:
-                    strHTML += `<td data-i="${i}" data-j="${j}" onmousedown="cellMarked(this,event,${i}, ${j})" onclick="cellClicked(this, ${i}, ${j})" class="cell cell-medium"></td>`
+                    strHTML += `<td data-i="${i}" data-j="${j}" onmousedown="cellMarked(this,event,${i}, ${j})" onclick="cellClicked(this, ${i}, ${j})" class="cell-medium" clicked="False"></td>`
 
                     break;
                 case 12:
-                    strHTML += `<td data-i="${i}" data-j="${j}" onmousedown="cellMarked(this,event,${i}, ${j})" onclick="cellClicked(this, ${i}, ${j})" class="cell cell-hard"></td>`
+                    strHTML += `<td data-i="${i}" data-j="${j}" onmousedown="cellMarked(this,event,${i}, ${j})" onclick="cellClicked(this, ${i}, ${j})" class="cell-hard" clicked="False"></td>`
 
                     break;
             }
@@ -130,6 +116,7 @@ elBoard.innerHTML = strHTML
 //clicks
 function cellClicked (elCell, i, j,){
     if (!gGame.isOver) {
+
        if (!gGame.isOn) {
            gGame.isOn = true
            gGameInterval = setInterval(() => {
@@ -138,28 +125,23 @@ function cellClicked (elCell, i, j,){
             
            }, 1000);
        }
+
        if (!gBoard[i][j].isShown && !gBoard[i][j].isMarked) {
-           if (gBoard[i][j].isMine) {
-               gLevel.LIVES--;
-               gBoard[i][j].isShelled = true
-               renderLives(gLevel.LIVES)
-               elCell.innerText = MINE_SIGN
-               gBoard[i][j].isShown = true
-               if (!gLevel.LIVES) {
-                   gElModal.querySelector('.lose-container').classList.add('show');
-                   gameOver()
-               }
-           } else {
+           if (gBoard[i][j].isMine) { //Clicked on mine
+              clickedOnMine(elCell, i, j)
+           } 
+
+           else { // Clicked not on mine
                gGame.shownCount++
                var minedNegs = setMinesNegsCount(i, j, gBoard)
-               elCell.classList.add('clicked');
+               //elCell.classList.add('clicked');
+               elCell.setAttribute("clicked", "True")
                gBoard[i][j].isShown = true
-               if (minedNegs) {
+               if (minedNegs > 0) {
                    elCell.innerText = minedNegs
-               } else {
-                   elCell.innerText = ''
+               } 
+               else {
                    showNegs(i, j, gBoard,)
-                   
                }
            }
        }
@@ -167,41 +149,56 @@ function cellClicked (elCell, i, j,){
    checkVictory(gBoard)
 }
 
+function clickedOnMine(elCell, i, j){
+    gLevel.LIVES--;
+    renderLives(gLevel.LIVES)
 
+    gBoard[i][j].isBombed = true
+    elCell.innerText = MINE_SIGN
+    gBoard[i][j].isShown = true
+
+    if (gLevel.LIVES === 0) {
+        gElModal.querySelector('.lose-container').classList.add('show');
+        gameOver()
+    }
+}
 
 function changeBoardSize(size){
     gLevel.SIZE = size
+    gLevel.CELL = gLevel.SIZE * gLevel.SIZE
     switch (gLevel.SIZE) {
         case 4:
             gLevel.LIVES = 1
             gLevel.MINES = 2
-            gLevel.CELL = 16
             break;
         case 8:
             gLevel.LIVES = 3
             gLevel.MINES = 12
-            gLevel.CELL = 64
 
             break;
         case 12:
             gLevel.LIVES  = 3
             gLevel.MINES = 30
-            gLevel.CELL = 144
-
-            
             break;
     }
-    
     initSweeper()
 
 }
 
+function checkVictory() {
+    if (markedRight === gLevel.MINES) {
+        gElModal.querySelector('.win-container').classList.add('show');
+        
+        gameOver()
+    }
 
+}
 
 function gameOver(){
     gGame.isOver = true
     clearInterval(gGameInterval)
     gGame.isOn = false
+
 }
 
 
@@ -223,93 +220,92 @@ function setMinesNegsCount(cellI, cellJ, board) {
 
   function showNegs(cellI, cellJ, board) {
     for (var i = cellI - 1; i <= cellI + 1; i++) {
-        if (i < 0 || i > board.length - 1) continue;
+        if (i < 0 || i > board.length - 1) continue; // Out of bounds
+
         for (var j = cellJ - 1; j <= cellJ + 1; j++) {
-            if (j < 0 || j > board[i].length - 1) continue;
-            if (i === cellI && j === cellJ) continue;
+            if (j < 0 || j > board[i].length - 1) continue; //Out of bounds
+            if (i === cellI && j === cellJ) continue; // Curr cell - not neighbor - not intresting
+
             var elCurrCell = gElModal.querySelector(`[data-i="${i}"][data-j="${j}"]`)
-            cellClicked(elCurrCell, i, j)
+            cellClicked(elCurrCell, i, j) // Should check it out
         }
     }
 }
 
 
-
-function checkVictory(board) {
-    var markedCount = 0
-    var notMineCount = 0
-    var shownCount = 0
-    for (var i = 0; i < board.length; i++) {
-        for (var j = 0; j < board.length; j++) {
-            if (!board[i][j].isMine) notMineCount++
-            if (board[i][j].isMarked || board[i][j].isShelled) markedCount++
-            if (board[i][j].isShown) shownCount++           
-        }
-    }
-   
-    if (shownCount === notMineCount && shownCount + markedCount === gLevel.CELLS) {
-        gElModal.querySelector('.win-container').classList.add('show');
-        
-        gameOver()
-    }
-
-}
         
 //clicks
 function cellMarked(elCell, ev, i, j) {
+    var curCell = gBoard[i][j]
     if (!gGame.isOver) {
-        if (ev.which === 3 && !gBoard[i][j].isShown) { // 3 is the right click
+        if (ev.which === 3 && !curCell.isShown) { // 3 is the right click
             elCell.addEventListener('contextmenu', (ev) => {
                 ev.preventDefault();
             })
-            if (!gGame.isOn) {
-                gGame.isOn = true
-                gGameInterval = setInterval(() => {
-                    gGame.secsPassed++
-                    timer.innerText = gGame.secsPassed
-                }, 1000);
-            }
-            if (!gBoard[i][j].isMarked) {
 
-                gBoard[i][j].isMarked = true
+            if (!curCell.isMarked) {
+                curCell.isMarked = true
                 elCell.innerText = FLAG_SIGN
+                updateMarked(i, j)
+
             } else {
-                gBoard[i][j].isMarked = false
+                curCell.isMarked = false
                 elCell.innerText = ''
+                updateUnMarked(i, j)
             }
         } //right click over
         checkVictory(gBoard)
     }
 }
 
+function updateMarkedRight(i, j){
+    markedCount++
+    cell = gBoard[i][j]
+    if (cell.isMine){
+        markedRight++
+    }
+}
 
-function renderLives(alives) {
+function updateUnMarkedRight(i, j){
+    markedCount--
+    cell = gBoard[i][j]
+    if (cell.isMine){
+        markedRight--
+    }
+}
+
+function renderLives(curNumOfLives) {
     var elAlives = gElModal.querySelector('.lives')
-    switch (alives) {
+    switch (curNumOfLives) {
+        case 0:
+            elAlives.innerText = ' '
+           break;
         case 1:
             elAlives.innerText = LIFE_SIGN
             break;
         case 2:
-            elAlives.innerText = `${LIFE_SIGN}  ${LIFE_SIGN}`
+            elAlives.innerText = `${LIFE_SIGN} ${LIFE_SIGN}`
             break;
         case 3:
             elAlives.innerText = `${LIFE_SIGN} ${LIFE_SIGN} ${LIFE_SIGN}`
             break;
-        default:
-             elAlives.innerText = ' '
-            break;
+    
 
     }
 }
 
 function createRandomMines() {
-    for (var i = 0; i < gLevel.MINES; i++) {
+    var minesPlaced = 0;
+
+    while (minesPlaced < gLevel.MINES){
+
         var currI = getRandomInt(0, gLevel.SIZE)
         var currj = getRandomInt(0, gLevel.SIZE)
-        if (gBoard[currI][currj].isMine) 
-        i--;
-        gBoard[currI][currj].isMine = true
+
+        if (!gBoard[currI][currj].isMine){
+            gBoard[currI][currj].isMine = true
+            minesPlaced++;
+        }
     }
-    
 }
 

@@ -70,8 +70,8 @@ body{
 .cell-hard{
     border: 1px solid rgba(255, 0, 0, 0.979);
 }
-.clicked{
-    background-color: '##B0B0B0'!important; 
+[clicked="True"]{
+    background-color: rgb(255,255, 255) /*'##B0B0B0'!important;*/ 
 }
 .difficulty{
     padding: 5px;
