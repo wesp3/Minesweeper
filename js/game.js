@@ -87,7 +87,7 @@ function initCell(board, i, j){
     }
 }
 
-function renderBoard(board) { //TODO maybe i should change the name of this function
+function renderBoard(board) { //TODO maybe i should change the name 
     var strHTML = ''
     for (var i = 0; i < board.length; i++) {
         strHTML += '<tr>'
@@ -169,7 +169,26 @@ function clickedOnMine(elCell, i, j){
     }
 }
 
+// some color to difficulty buttons 
+
 function changeBoardSize(size){
+    const easyBtn = document.querySelector('.easy')
+    const mediumBtn = document.querySelector('.medium')
+    const extremeBtn = document.querySelector('.hard')
+
+    if (size == 4) {
+        easyBtn.style.backgroundColor = "green"
+        mediumBtn.style.backgroundColor = "white"
+        extremeBtn.style.backgroundColor = "white"
+    } else if (size == 8) {
+        easyBtn.style.backgroundColor = 'white'
+        mediumBtn.style.backgroundColor = "yellow"
+        extremeBtn.style.backgroundColor = "white"
+    } else if (size == 12) {
+        easyBtn.style.backgroundColor = 'white'
+        mediumBtn.style.backgroundColor = "white"
+        extremeBtn.style.backgroundColor = "red"
+    }
     gLevel.SIZE = size
     gLevel.CELL = gLevel.SIZE * gLevel.SIZE
     switch (gLevel.SIZE) {
@@ -244,7 +263,7 @@ function setMinesNegsCount(cellI, cellJ, board) {
 function cellMarked(elCell, ev, i, j) {
     var curCell = gBoard[i][j]
     if (!gGame.isOver ) {
-        if (ev.which === 3 && !curCell.isShown) { // 3 is the right click
+        if (ev.which === 3 && !curCell.isShown) {           // 3 is the right click
             elCell.addEventListener('contextmenu', (ev) => {
                 ev.preventDefault();
             })
@@ -259,7 +278,7 @@ function cellMarked(elCell, ev, i, j) {
                 elCell.innerText = ''
                 updateUnMarked(i, j)
             }
-        } //right click over
+        }                                   //right click over
         checkVictory(gBoard)
     }
 }
