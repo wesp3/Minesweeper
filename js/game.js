@@ -2,13 +2,16 @@
 
 //NEEDS TO BE FIXED:
 //Containers! 
-//reset button not working, background color when clicking on the cell is not changing
-//by losing the window is hanging on the board
-//fix signs show up
+// victory wont appear --fixed
+//reset button not working, background color when clicking on the cell is not changing --fixed2
+//by losing the window "You lose" is hanging on the board -- fixed
+//fix signs show up --fixed
+
+// infinity flags --fixed
+//
 // work on CSS has to be done, the hardest mode on board is having problems with padding
 //code refactoring(!)
 
-// victory wont appear 
 
 
 const MINE_SIGN = "💣"
@@ -31,14 +34,7 @@ var gLevel = {
     CELL: 16
     }
 
-var gGame = {
-    isOn: false,
-    isOver: false,
-    shownCount: 0,
-    markedCount: 0,
-    markedRight: 0,
-    secsPassed: 0
-    }  
+var gGame;
 
 //decl. of global variables 
 var timer;
@@ -46,42 +42,50 @@ var timer;
 //init func for game and creating the board
 
 function initSweeper() {
+    gElModal.querySelector('.lose-container').classList.remove('show')
+    gElModal.querySelector('.win-container').classList.remove('show')
     gElModal.querySelector('.reset').innerText = DEFAULT_SIGN 
     gBoard= createBoard(gLevel.SIZE)
-    createRandomMines()
+    createRandomMines()                                     // mines appear also on first click 
     renderBoard(gBoard)
     clearInterval(gGameInterval)
     timer = gElModal.querySelector('.timer')
     timer.innerText = 0
+    initgGame()
+    renderLives(gLevel.LIVES)
+}
+
+function initgGame(){
     gGame = {
         isOn: false,
         isOver: false,
         shownCount: 0,
         markedCount: 0,
+        markedRight: 0,
         secsPassed: 0
     }
-    renderLives(gLevel.LIVES)
 }
-
 
 function createBoard(size) {
     var board = [];
     for (var i = 0; i < size; i++) {
         board.push([])
         for (var j = 0; j < size; j++) {
-            board[i][j] = {
-                isMine: false,
-                isBombed: false,
-                isShown: false,
-                isMarked: false,
-                minesAroundCount:0
-            }
+            initCell(board, i, j)
         }
     }
     return board;
 }
 
-
+function initCell(board, i, j){
+    board[i][j] = {
+        isMine: false,
+        isBombed: false,
+        isShown: false,
+        isMarked: false,
+        minesAroundCount:0
+    }
+}
 
 function renderBoard(board) { //TODO maybe i should change the name of this function
     var strHTML = ''
@@ -113,7 +117,6 @@ elBoard.innerHTML = strHTML
 
 
 
-//clicks
 function cellClicked (elCell, i, j,){
     if (!gGame.isOver) {
 
@@ -127,11 +130,11 @@ function cellClicked (elCell, i, j,){
        }
 
        if (!gBoard[i][j].isShown && !gBoard[i][j].isMarked) {
-           if (gBoard[i][j].isMine) { //Clicked on mine
+           if (gBoard[i][j].isMine) {                           //Clicked on mine
               clickedOnMine(elCell, i, j)
            } 
 
-           else { // Clicked not on mine
+           else {                                                // Clicked not on mine
                gGame.shownCount++
                var minedNegs = setMinesNegsCount(i, j, gBoard)
                //elCell.classList.add('clicked');
@@ -141,7 +144,7 @@ function cellClicked (elCell, i, j,){
                    elCell.innerText = minedNegs
                } 
                else {
-                   showNegs(i, j, gBoard,)
+                   showNegs(i, j, gBoard)
                }
            }
        }
@@ -154,11 +157,14 @@ function clickedOnMine(elCell, i, j){
     renderLives(gLevel.LIVES)
 
     gBoard[i][j].isBombed = true
+    gGame.markedRight++
+    gGame.markedCount++
     elCell.innerText = MINE_SIGN
     gBoard[i][j].isShown = true
 
     if (gLevel.LIVES === 0) {
         gElModal.querySelector('.lose-container').classList.add('show');
+        gElModal.querySelector('.reset').innerText = LOSER_SIGN 
         gameOver()
     }
 }
@@ -181,14 +187,15 @@ function changeBoardSize(size){
             gLevel.MINES = 30
             break;
     }
+    //renderBoard()
     initSweeper()
 
 }
 
 function checkVictory() {
-    if (markedRight === gLevel.MINES) {
+    if (gGame.markedRight === gLevel.MINES) {
         gElModal.querySelector('.win-container').classList.add('show');
-        
+        gElModal.querySelector('.reset').innerText = WINNER_SIGN 
         gameOver()
     }
 
@@ -198,7 +205,6 @@ function gameOver(){
     gGame.isOver = true
     clearInterval(gGameInterval)
     gGame.isOn = false
-
 }
 
 
@@ -218,7 +224,8 @@ function setMinesNegsCount(cellI, cellJ, board) {
   }
 
 
-  function showNegs(cellI, cellJ, board) {
+  function showNegs(cellI, cellJ, board) { // There is a bug here with diagonal neighbors 
+    
     for (var i = cellI - 1; i <= cellI + 1; i++) {
         if (i < 0 || i > board.length - 1) continue; // Out of bounds
 
@@ -232,23 +239,22 @@ function setMinesNegsCount(cellI, cellJ, board) {
     }
 }
 
-
-        
+      
 //clicks
 function cellMarked(elCell, ev, i, j) {
     var curCell = gBoard[i][j]
-    if (!gGame.isOver) {
+    if (!gGame.isOver ) {
         if (ev.which === 3 && !curCell.isShown) { // 3 is the right click
             elCell.addEventListener('contextmenu', (ev) => {
                 ev.preventDefault();
             })
 
-            if (!curCell.isMarked) {
+            if (!curCell.isMarked && gGame.markedCount < gLevel.MINES) {
                 curCell.isMarked = true
                 elCell.innerText = FLAG_SIGN
                 updateMarked(i, j)
-
-            } else {
+            }
+             else if (curCell.isMarked) {
                 curCell.isMarked = false
                 elCell.innerText = ''
                 updateUnMarked(i, j)
@@ -258,20 +264,21 @@ function cellMarked(elCell, ev, i, j) {
     }
 }
 
-function updateMarkedRight(i, j){
-    markedCount++
-    cell = gBoard[i][j]
+function updateMarked(i, j){
+    gGame.markedCount++
+    var cell = gBoard[i][j]
     if (cell.isMine){
-        markedRight++
+        gGame.markedRight++
     }
 }
 
-function updateUnMarkedRight(i, j){
-    markedCount--
-    cell = gBoard[i][j]
+function updateUnMarked(i, j){
+    gGame.markedCount--
+    var cell = gBoard[i][j]
     if (cell.isMine){
-        markedRight--
+        gGame.markedRight--
     }
+
 }
 
 function renderLives(curNumOfLives) {
@@ -295,7 +302,7 @@ function renderLives(curNumOfLives) {
 }
 
 function createRandomMines() {
-    var minesPlaced = 0;
+    var minesPlaced = 0
 
     while (minesPlaced < gLevel.MINES){
 

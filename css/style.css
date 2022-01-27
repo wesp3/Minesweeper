@@ -71,7 +71,7 @@ body{
     border: 1px solid rgba(255, 0, 0, 0.979);
 }
 [clicked="True"]{
-    background-color: rgb(255,255, 255) /*'##B0B0B0'!important;*/ 
+    background-color:  rgb(255, 255, 255); 
 }
 .difficulty{
     padding: 5px;

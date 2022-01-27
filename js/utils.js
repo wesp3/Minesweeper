@@ -1,18 +1,18 @@
 'use strict'
 
-function setMinesNeighboursCount(cellI, cellJ, mat) {
-  var minesNeighboursCount = 0;
-  for (var i = cellI - 1; i <= cellI + 1; i++) {
-      if (i < 0 || i > mat.length - 1) continue;
-      for (var j = cellJ - 1; j <= cellJ + 1; j++) {
-          if (j < 0 || j > mat[i].length - 1) continue;
-          if (i === cellI && j === cellJ) continue;
+// function setMinesNeighboursCount(cellI, cellJ, mat) {
+//   var minesNeighboursCount = 0;
+//   for (var i = cellI - 1; i <= cellI + 1; i++) {
+//       if (i < 0 || i > mat.length - 1) continue;
+//       for (var j = cellJ - 1; j <= cellJ + 1; j++) {
+//           if (j < 0 || j > mat[i].length - 1) continue;
+//           if (i === cellI && j === cellJ) continue;
         
-          if (gBoard[i][j].isMine) minesNeighboursCount++;
-      }
-  }
-  return minesNeighboursCount;
-}
+//           if (gBoard[i][j].isMine) minesNeighboursCount++;
+//       }
+//   }
+//   return minesNeighboursCount;
+// }
 
 
 
