@@ -54,7 +54,7 @@ body{
     box-shadow: 5em;
 }
 .game-container{
-    width: 30rem;
+    width: 27rem;
 }
 
 .menu{
@@ -91,7 +91,7 @@ body{
 }
 .board-container{
     width: 100%;
-    height: 30rem;
+    height: 27rem;
     background-color:lightgray;;
     margin: 15px 0;
 }
@@ -119,12 +119,9 @@ body{
 }
 .cell{
     /*margin: 5px 0;*/
-    border: 0.5px groove #fff;
+    border: 0.5px groove #d1d1d1;
     border-radius: 5px;
     background: #e0e0e0;
-    -webkit-appearance: none;
-    -webkit-box-shadow:  20px 20px 60px #bebebe,
-               -20px -20px 60px #ffffff;;
     box-shadow:  20px 20px 60px #bebebe,
                -20px -20px 60px #ffffff;
 }
@@ -164,7 +161,7 @@ body{
 }
 .stripe-text {
   position: relative;
-  font-size: 80px;
+  font-size: 70px;
   text-transform: uppercase;
   font-weight: 900;
   font-family: "Catamaran", sans-serif;
@@ -173,13 +170,22 @@ body{
 .stripe-text:after {
   position: absolute;
   left: 0;
+  top: 0;
   content: "Minesweeper V4";
   background: -webkit-repeating-linear-gradient(135deg, #f41fbf, #f41fbf 20px, #ffed28 20px, #ffed28 40px, #b028ff 40px, #b028ff 60px, #39dbc2 60px, #39dbc2 80px);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  -webkit-text-stroke-width: 4px;
+  -webkit-text-stroke-width: 3.5px;
   -webkit-text-stroke-color: white;
+}
+@media (max-width: 700px){
+    .stripe-text{
+        font-size: 9vw;
+    }
+    .stripe-text:after{
+        -webkit-text-stroke-width: 0.45vw;
+    }
 }
 .stripe-text:before {
   z-index: -1;
