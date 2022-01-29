@@ -4,20 +4,19 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MinesweeperV1</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body onload="initSweeper()">
-    <div class="container modal">
-        <div class="container game-container">
-            <h1 class="title">MinesweeperV1</h1>
+<body onload="changeBoardSize(4)">
 
+    <div class="container modal">
+        <h1 class="title stripe-text">Minesweeper V4</h1>
+        <div class="container game-container">
             <div class="menu">
                 <div class="lives-container">
                     Lives: <span class="lives"></span>
                 </div>
                 <div class="reset-container">
-                    <button onclick="changeBoardSize(4)"><span class="reset">Reset</span></button>
+                    <button onclick="changeBoardSize(gLevel.SIZE)"><span class="reset">Reset</span></button>
                 </div>
                 <div class="timer-container">
                     Timer: <span class="timer"></span>
@@ -30,9 +29,11 @@
             </div>
 
             <div class="difficulty">
-                <button class="easy" onclick="changeBoardSize(4)">Novice</button>
-                <button class="medium" onclick="changeBoardSize(8)">Journeyman</button>
-                <button class="hard" onclick="changeBoardSize(12)">Unreal</button>
+                <button class="easy button-5" onclick="changeBoardSize(4)">Novice</button>
+                <button class="medium button-5" onclick="changeBoardSize(8)">Medium</button>
+                <button class="hard button-5" onclick="changeBoardSize(12)">Unreal</button>
+                <!-- <button class="seven_boom button-5" onclick="createSevenBoomGame()">7 Boom</button> -->
+                <button class="seven_boom button-5" onclick="createSevenBoomGame()">7 Boom</button>
             </div>
 
         </div>

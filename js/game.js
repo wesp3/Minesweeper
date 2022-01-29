@@ -8,8 +8,8 @@
 //fix signs show up --fixed
 
 // infinity flags --fixed
-//
-// work on CSS has to be done, the hardest mode on board is having problems with padding
+//de fix
+// work on CSS has to be done,hard mo
 //code refactoring(!)
 
 
@@ -26,27 +26,28 @@ const WINNER_SIGN = "😎"
 var gBoard = []
 var gGameInterval
 var gElModal = document.querySelector('.modal')
-
-var gLevel = { 
-    SIZE: 4,
-    MINES: 2,
-    LIVES: 1,
-    CELL: 16
-    }
-
 var gGame;
+var firstClick
+
+var gLevel = {
+   // SIZE,
+   // MINES,
+   //LIVES,
+   //CELL
+}
+
+
 
 //decl. of global variables 
 var timer;
-
+var sevenBoomOn = false
 //init func for game and creating the board
 
 function initSweeper() {
     gElModal.querySelector('.lose-container').classList.remove('show')
     gElModal.querySelector('.win-container').classList.remove('show')
     gElModal.querySelector('.reset').innerText = DEFAULT_SIGN 
-    gBoard= createBoard(gLevel.SIZE)
-    createRandomMines()                                     // mines appear also on first click 
+    gBoard = createBoard(gLevel.SIZE)                                     
     renderBoard(gBoard)
     clearInterval(gGameInterval)
     timer = gElModal.querySelector('.timer')
@@ -57,6 +58,7 @@ function initSweeper() {
 
 function initgGame(){
     gGame = {
+        sevenBoomOn: false,
         isOn: false,
         isOver: false,
         shownCount: 0,
@@ -93,18 +95,15 @@ function renderBoard(board) { //TODO maybe i should change the name
         strHTML += '<tr>'
         for (var j = 0; j < board[0].length; j++) {
             var cell = board[i][j]
-            switch (gLevel.SIZE) {                       //cells
+            switch (gLevel.SIZE) {                       
                 case 4:
-                    strHTML += `<td data-i="${i}" data-j="${j}" onmousedown="cellMarked(this,event,${i}, ${j})" onclick="cellClicked(this, ${i}, ${j})" class="cell-easy" clicked="False"></td>`
-
+                    strHTML += `<td data-i="${i}" data-j="${j}" onmousedown="cellMarked(this,event,${i}, ${j})" onclick="cellClicked(this, ${i}, ${j})" class="cell cell-easy" clicked="False"></td>`
                     break;
                 case 8:
-                    strHTML += `<td data-i="${i}" data-j="${j}" onmousedown="cellMarked(this,event,${i}, ${j})" onclick="cellClicked(this, ${i}, ${j})" class="cell-medium" clicked="False"></td>`
-
+                    strHTML += `<td data-i="${i}" data-j="${j}" onmousedown="cellMarked(this,event,${i}, ${j})" onclick="cellClicked(this, ${i}, ${j})" class="cell cell-medium" clicked="False"></td>`
                     break;
                 case 12:
-                    strHTML += `<td data-i="${i}" data-j="${j}" onmousedown="cellMarked(this,event,${i}, ${j})" onclick="cellClicked(this, ${i}, ${j})" class="cell-hard" clicked="False"></td>`
-
+                    strHTML += `<td data-i="${i}" data-j="${j}" onmousedown="cellMarked(this,event,${i}, ${j})" onclick="cellClicked(this, ${i}, ${j})" class="cell cell-hard" clicked="False"></td>`
                     break;
             }
 
@@ -115,23 +114,30 @@ var elBoard = document.querySelector('.board')
 elBoard.innerHTML = strHTML
 }
 
-
+function turnGameOn(clickedI, clickedJ){
+    gGame.isOn = true
+    if(gGame.sevenBoomOn){
+        createSevenBoomMines()
+    }
+    else{
+        createRandomMines(clickedI, clickedJ)
+    }
+    gGameInterval = setInterval(() => {
+        gGame.secsPassed++
+        timer.innerText = gGame.secsPassed
+     
+    }, 1000);
+}
 
 function cellClicked (elCell, i, j,){
-    if (!gGame.isOver) {
-
-       if (!gGame.isOn) {
-           gGame.isOn = true
-           gGameInterval = setInterval(() => {
-               gGame.secsPassed++
-               timer.innerText = gGame.secsPassed
-            
-           }, 1000);
+        if (!gGame.isOver) {
+        if (!gGame.isOn) {
+            turnGameOn(i, j);
        }
-
-       if (!gBoard[i][j].isShown && !gBoard[i][j].isMarked) {
-           if (gBoard[i][j].isMine) {                           //Clicked on mine
-              clickedOnMine(elCell, i, j)
+       var clickedCell = gBoard[i][j]
+       if (!clickedCell.isShown && !clickedCell.isMarked) {
+           if (clickedCell.isMine) {                           //Clicked on mine
+              clickedOnMine(elCell, clickedCell)
            } 
 
            else {                                                // Clicked not on mine
@@ -139,7 +145,7 @@ function cellClicked (elCell, i, j,){
                var minedNegs = setMinesNegsCount(i, j, gBoard)
                //elCell.classList.add('clicked');
                elCell.setAttribute("clicked", "True")
-               gBoard[i][j].isShown = true
+               clickedCell.isShown = true
                if (minedNegs > 0) {
                    elCell.innerText = minedNegs
                } 
@@ -148,19 +154,20 @@ function cellClicked (elCell, i, j,){
                }
            }
        }
+    
    }
    checkVictory(gBoard)
 }
 
-function clickedOnMine(elCell, i, j){
+function clickedOnMine(elCell, clickedCell){
     gLevel.LIVES--;
     renderLives(gLevel.LIVES)
 
-    gBoard[i][j].isBombed = true
+    clickedCell.isBombed = true
     gGame.markedRight++
     gGame.markedCount++
     elCell.innerText = MINE_SIGN
-    gBoard[i][j].isShown = true
+    clickedCell.isShown = true
 
     if (gLevel.LIVES === 0) {
         gElModal.querySelector('.lose-container').classList.add('show');
@@ -171,26 +178,29 @@ function clickedOnMine(elCell, i, j){
 
 // some color to difficulty buttons 
 
+
+
 function changeBoardSize(size){
     const easyBtn = document.querySelector('.easy')
     const mediumBtn = document.querySelector('.medium')
-    const extremeBtn = document.querySelector('.hard')
+    const hardBtn = document.querySelector('.hard')
+    const sevenBoomBtn = document.querySelector('.seven_boom')
 
-    if (size == 4) {
-        easyBtn.style.backgroundColor = "green"
-        mediumBtn.style.backgroundColor = "white"
-        extremeBtn.style.backgroundColor = "white"
-    } else if (size == 8) {
-        easyBtn.style.backgroundColor = 'white'
-        mediumBtn.style.backgroundColor = "yellow"
-        extremeBtn.style.backgroundColor = "white"
-    } else if (size == 12) {
-        easyBtn.style.backgroundColor = 'white'
-        mediumBtn.style.backgroundColor = "white"
-        extremeBtn.style.backgroundColor = "red"
-    }
+    // easyBtn.style.backgroundColor = "white"
+    // mediumBtn.style.backgroundColor = "white"
+    // extremeBtn.style.backgroundColor = "white"
+    // sevenBoomBtn.style.backgroundColor = "white"
+
+    // if (size == 4) {
+    //     easyBtn.style.backgroundColor = "green"
+    // } else if (size == 8) {
+    //     mediumBtn.style.backgroundColor = "yellow"
+    // } else if (size == 12) {
+    //     extremeBtn.style.backgroundColor = "red"
+    // }
+
     gLevel.SIZE = size
-    gLevel.CELL = gLevel.SIZE * gLevel.SIZE
+    gLevel.CELL = gLevel.SIZE * gLevel.SIZE // no need 
     switch (gLevel.SIZE) {
         case 4:
             gLevel.LIVES = 1
@@ -199,7 +209,6 @@ function changeBoardSize(size){
         case 8:
             gLevel.LIVES = 3
             gLevel.MINES = 12
-
             break;
         case 12:
             gLevel.LIVES  = 3
@@ -320,14 +329,14 @@ function renderLives(curNumOfLives) {
     }
 }
 
-function createRandomMines() {
+function createRandomMines(clickedI, clickedJ) {
     var minesPlaced = 0
 
     while (minesPlaced < gLevel.MINES){
 
         var currI = getRandomInt(0, gLevel.SIZE)
         var currj = getRandomInt(0, gLevel.SIZE)
-
+        if (currI === clickedI && currj === clickedJ) continue;
         if (!gBoard[currI][currj].isMine){
             gBoard[currI][currj].isMine = true
             minesPlaced++;
@@ -335,3 +344,45 @@ function createRandomMines() {
     }
 }
 
+function isSevenBoom(number){
+    if (number % 7 == 0 ) {
+        return true
+    }
+    else if (number.toString().match(/7/)) {
+        return true
+    }
+    else {
+        return false
+    }
+}
+
+function createSevenBoomMines(){
+    gLevel.MINES = 0
+    var curNum = 1
+    for(var currI=0; currI<gLevel.SIZE; currI++){
+        for (var currJ=0; currJ<gLevel.SIZE; currJ++){
+        if (isSevenBoom(curNum)){
+            gBoard[currI][currJ].isMine = true
+            gLevel.MINES++; 
+          }
+        curNum++
+        }
+    }
+}
+
+function changeSevenBoomBtn(){
+    const sevenBoomBtn = document.querySelector('.seven_boom')
+    // sevenBoomBtn.style.backgroundColor = "blue"
+}
+
+function createSevenBoomGame(){
+    changeBoardSize(gLevel.SIZE)
+    gGame.sevenBoomOn = true
+    changeSevenBoomBtn()
+}
+
+// function showHint(){
+//     if(!gGame.isOn){
+//         pass 
+//     }
+// }

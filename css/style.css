@@ -1,24 +1,75 @@
+@font-face {
+  font-family: "Catamaran";
+  src: url(fonts/Catamaran-Black.ttf);
+  font-weight: 900;
+}
+@font-face {
+  font-family: "Catamaran";
+  src: url(fonts/Catamaran-Regular.ttf);
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Catamaran";
+  src: url(fonts/Catamaran-Medium.ttf);
+  font-weight: 500;
+}
+@font-face {
+  font-family: "Catamaran";
+  src: url(fonts/Catamaran-Bold.ttf);
+  font-weight: 700;
+}
+@font-face {
+  font-family: "Catamaran";
+  src: url(fonts/Catamaran-SemiBold.ttf);
+  font-weight: 600;
+}
+@font-face {
+  font-family: "Catamaran";
+  src: url(fonts/Catamaran-Light.ttf);
+  font-weight: 300;
+}
+@font-face {
+  font-family: "Catamaran";
+  src: url(fonts/Catamaran-Thin.ttf);
+  font-weight: 100;
+}
+
+*, *:before, *:after {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
 
 body{
     text-align: center;
-    background-color: #f2f2f2;
+    background-color: #0D8584;
+    /*font-family: 'Courier New', monospace;*/
+    font-family: 'Catamaran', sans-serif;
 }
+
 .container{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    box-shadow: 5em;
 }
 .game-container{
     width: 30rem;
 }
+
 .menu{
     display: flex;
     flex-direction: row;
     justify-content: center;
+    align-items: center;
     width: 100%;
     position: relative;
-    height: 30px;
+    height: 55px;
+    font-weight: 600;
+    text-transform: capitalize;
+    letter-spacing: .2px;
+    font-size: 18px;
+    color: white;
 }
 .menu div{
     padding: 8px;
@@ -28,8 +79,12 @@ body{
 .lives-container{
     left: 0;
 }
+.reset-container button{
+    padding: 5px 10px;
+}
 .reset{
-    padding: 0 20px;
+    /*padding: 0 30px;*/
+    width: auto;
 }
 .timer-container{
     right: 0;
@@ -37,14 +92,18 @@ body{
 .board-container{
     width: 100%;
     height: 30rem;
-    background-color: rgb(114, 177, 214);
+    background-color:lightgray;;
     margin: 15px 0;
 }
 .board{
     width: 100%;
     height: 100%;
     table-layout: fixed;
+    border-collapse: collapse;
     overflow: hidden;
+}
+.board tbody{
+    border-style: hidden;
 }
 .cell-easy{
     width: 25%;
@@ -55,43 +114,156 @@ body{
     height: 12.5%;
 }
 .cell-hard{
-    width: 8.333%;
-    height: 8.333%;
+    width: 7.333%;
+    height: 7.333%;
 }
 .cell{
-    margin: 5px 0; 
+    /*margin: 5px 0;*/
+    border: 0.5px groove #fff;
+    border-radius: 5px;
+    background: #e0e0e0;
+    -webkit-appearance: none;
+    -webkit-box-shadow:  20px 20px 60px #bebebe,
+               -20px -20px 60px #ffffff;;
+    box-shadow:  20px 20px 60px #bebebe,
+               -20px -20px 60px #ffffff;
 }
-.cell-easy{
-    border: 1px solid rgb(94, 255, 0);
-}
-.cell-medium{
-    border: 1px solid rgb(255, 230, 0);
-}
-.cell-hard{
-    border: 1px solid rgba(255, 0, 0, 0.979);
-}
+
 [clicked="True"]{
-    background-color:  rgb(255, 255, 255); 
+    background-color: rgba(255, 255, 255, 0.952); 
 }
 .difficulty{
     padding: 5px;
 }
-.difficulty button{
-    padding: 8px;
-    margin: 0 10px;
-}
 .lose-container, .win-container{
     position: absolute;
-    background: #f2f2f2;
     padding: 40px;
     border-radius: 9px;
     display: none;
+}
+.lose-container{
+    background: #ee9fa9da;
+}
+.win-container{
+    background: #9feeb7da;
 }
 .show{
     display: block;
 }
 
-.difficulty button {
+/*.difficulty button {
     border: 1px solid black;
     border-radius: 0.3rem;
+    font-family: 'Courier New', monospace;
+}*/
+
+
+/*TITLE TEXT EFFECT*/
+.title{
+    margin: 20px;
 }
+.stripe-text {
+  position: relative;
+  font-size: 80px;
+  text-transform: uppercase;
+  font-weight: 900;
+  font-family: "Catamaran", sans-serif;
+  font-style: italic;
+}
+.stripe-text:after {
+  position: absolute;
+  left: 0;
+  content: "Minesweeper V4";
+  background: -webkit-repeating-linear-gradient(135deg, #f41fbf, #f41fbf 20px, #ffed28 20px, #ffed28 40px, #b028ff 40px, #b028ff 60px, #39dbc2 60px, #39dbc2 80px);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-stroke-width: 4px;
+  -webkit-text-stroke-color: white;
+}
+.stripe-text:before {
+  z-index: -1;
+  position: absolute;
+  content: "Minesweeper V4";
+  color: #f41fbf;
+  top: 0px;
+  left: 0px;
+  text-shadow: 5px 0px #f41fbf, 6px 1px #f41fbf, 7px 2px #f41fbf, 8px 3px #f41fbf, 9px 4px #f41fbf, 10px 5px #f41fbf, 11px 6px #f41fbf, 12px 7px #f41fbf, 13px 8px #f41fbf, 14px 9px #f41fbf, 15px 10px #f41fbf;
+}
+
+
+/*BUTTONS*/
+.button-5 {
+  align-items: center;
+  background-clip: padding-box;
+  /*background-color: #fa6400;*/
+  border: 1px solid transparent;
+  border-radius: .25rem;
+  box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  /*font-family: system-ui,-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;*/
+  font-size: 16px;
+  font-weight: 600;
+  justify-content: center;
+  line-height: 1.25;
+  margin: 0;
+  /*min-height: 3rem;*/
+  padding: calc(.875rem - 1px) calc(1.5rem - 1px);
+  position: relative;
+  text-decoration: none;
+  transition: all 250ms;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: baseline;
+  width: auto;
+}
+
+.button-5:hover{
+  /*background-color: #fb8332;*/
+  box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+}
+
+.button-5:hover {
+  transform: translateY(-1px);
+}
+
+.button-5:active {
+  /*background-color: #c85000;*/
+  box-shadow: rgba(0, 0, 0, .06) 0 2px 4px;
+  transform: translateY(0);
+}
+
+.difficulty button{
+    color: #f2f2f2;
+    padding: 8px 10px;
+    margin: 0 4px;
+}
+.easy{
+    background-color: #39dbc1;
+}
+.medium{
+    background-color: #ffed27;
+    color: #2f2f2f!important;
+}
+.hard{
+    background-color: #b028ff;
+}
+.seven_boom{
+    background-color: #00a3fa;
+    margin-left: 25px!important;
+}
+.seven_boom:active, .seven_boom:focus{
+    background-color: blue;
+}
+/* COLORS
+    blue #00a3fa
+    cyan #39dbc1
+    pink #f420bf
+    yellow #ffed27
+    purple #b028ff
+
+ */
