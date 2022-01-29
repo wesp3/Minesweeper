@@ -38,10 +38,10 @@ var gLevel = {
 
 
 
-//decl. of global variables 
+
 var timer;
 var sevenBoomOn = false
-//init func for game and creating the board
+
 
 function initSweeper() {
     gElModal.querySelector('.lose-container').classList.remove('show')
@@ -89,7 +89,7 @@ function initCell(board, i, j){
     }
 }
 
-function renderBoard(board) { //TODO maybe i should change the name 
+function renderBoard(board) { 
     var strHTML = ''
     for (var i = 0; i < board.length; i++) {
         strHTML += '<tr>'
